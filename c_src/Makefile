@@ -3,8 +3,17 @@ BASEDIR		:= $(abspath $(dir $(CURDIR)))
 PROJECT		?= erlexec
 PROJECT		:= $(strip $(PROJECT))
 
+ifeq ($(ERL_EI_INCLUDE_DIR),)
 ERL_CXXFLAGS ?= $(shell erl -noshell -noinput -eval "io:format(\"-I~ts/erts-~ts/include -I~ts\", [code:root_dir(), erlang:system_info(version), code:lib_dir(erl_interface, include)]), halt(0).")
+else
+ERL_CXXFLAGS ?= -I$(ERL_EI_INCLUDE_DIR)
+endif
+
+ifeq ($(ERL_EI_LIBDIR),)
 ERL_LDFLAGS  ?= $(shell erl -noshell -noinput -eval "io:format(\"-L~ts\", [code:lib_dir(erl_interface, lib)]), halt(0).")
+else
+ERL_LDFLAGS  ?= -L$(ERL_EI_LIBDIR)
+endif
 
 CXXFLAGS  += -g -std=c++11 -finline-functions -Wall -DHAVE_PTRACE -MMD
 USE_POLL  ?= 1
